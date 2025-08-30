@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 
 # 响应基础模型
@@ -55,7 +55,7 @@ class StatsData(BaseModel):
     used_codes: int
     remaining_codes: int
     usage_rate: float
-    recent_claims: list[RecentClaim] = []
+    recent_claims: List[RecentClaim] = []
 
 class StatsResponse(BaseResponse):
     success: bool = True

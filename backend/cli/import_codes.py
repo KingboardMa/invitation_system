@@ -11,6 +11,7 @@ import sys
 import os
 from pathlib import Path
 from tqdm import tqdm
+from typing import List
 
 # 添加项目根目录到Python路径
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -20,7 +21,7 @@ from models.offer import Offer
 from services.code_service import CodeService
 from services.offer_service import OfferService
 
-def read_codes_from_file(file_path: str) -> list[str]:
+def read_codes_from_file(file_path: str) -> List[str]:
     """从文件读取邀请码"""
     try:
         with open(file_path, 'r', encoding='utf-8') as f:

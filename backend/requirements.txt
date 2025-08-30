@@ -1,9 +1,8 @@
-fastapi
-uvicorn[standard]
-sqlalchemy
+fastapi>=0.68.0,<1.0.0
+uvicorn[standard]>=0.15.0
+sqlalchemy>=1.4.0,<2.0.0
 python-multipart
-pydantic
-pydantic-settings
+pydantic>=1.8.0,<2.0.0
 python-dotenv
 click
 tqdm
