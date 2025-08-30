@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+python-multipart
+pydantic
+pydantic-settings
+python-dotenv
+click
+tqdm
+requests

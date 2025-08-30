@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>邀请码领取</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .title {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .description {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .stats {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+
+        .progress-container {
+            margin-bottom: 20px;
+        }
+
+        .progress-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 25px;
+            height: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #28a745, #20c997);
+            height: 100%;
+            transition: width 0.6s ease;
+            border-radius: 25px;
+        }
+
+        .count-info {
+            font-size: 18px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .remaining {
+            color: #28a745;
+        }
+
+        .total {
+            color: #6c757d;
+        }
+
+        .claim-section {
+            margin: 30px 0;
+        }
+
+        .claim-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            padding: 15px 40px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .claim-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .claim-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-section {
+            margin: 30px 0;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .result-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .result-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .code-display {
+            background: #f1f3f4;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            word-break: break-all;
+            position: relative;
+        }
+
+        .copy-btn {
+            background: #28a745;
+            border: none;
+            border-radius: 25px;
+            color: white;
+            padding: 8px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #218838;
+        }
+
+        .copy-btn.copied {
+            background: #6c757d;
+        }
+
+        .loading {
+            display: none;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .message {
+            margin-top: 15px;
+            font-size: 16px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .title {
+                font-size: 24px;
+            }
+
+            .claim-btn {
+                font-size: 16px;
+                padding: 12px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title" id="offerTitle">正在加载...</h1>
+            <p class="description" id="offerDescription">正在获取项目信息...</p>
+        </div>
+
+        <div class="stats">
+            <div class="progress-container">
+                <div class="progress-label">剩余邀请码</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="count-info">
+                <span class="remaining" id="remainingCount">-</span> /
+                <span class="total" id="totalCount">-</span>
+            </div>
+        </div>
+
+        <div class="claim-section">
+            <button class="claim-btn" id="claimBtn" onclick="claimCode()">
+                领取邀请码
+            </button>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div class="message">正在申请邀请码...</div>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div class="message" id="resultMessage"></div>
+            <div class="code-display" id="codeDisplay" style="display: none;">
+                <div id="invitationCode"></div>
+                <button class="copy-btn" id="copyBtn" onclick="copyCode()">复制到剪贴板</button>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>每个用户限制申请次数，请合理使用</p>
+        </div>
+    </div>
+
+    <script>
+        // 获取当前offer名称
+        const currentPath = window.location.pathname;
+        const offerName = currentPath.split('/').pop();
+
+        // API基础URL
+        const API_BASE = 'http://localhost:8000/api/v1';
+
+        let currentCode = '';
+
+        // 页面加载时获取offer信息
+        document.addEventListener('DOMContentLoaded', function() {
+            loadOfferInfo();
+        });
+
+        // 加载offer信息
+        async function loadOfferInfo() {
+            try {
+                const response = await fetch(`${API_BASE}/offers/${offerName}/info`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const offer = data.data;
+                    document.getElementById('offerTitle').textContent = offer.title;
+                    document.getElementById('offerDescription').textContent = offer.description || '获取您的专属邀请码';
+
+                    updateStats(offer.remaining_count, offer.total_count);
+
+                    // 检查是否还有剩余邀请码
+                    const claimBtn = document.getElementById('claimBtn');
+                    if (offer.remaining_count <= 0) {
+                        claimBtn.disabled = true;
+                        claimBtn.textContent = '邀请码已用完';
+                    } else if (!offer.is_active) {
+                        claimBtn.disabled = true;
+                        claimBtn.textContent = '当前项目已停用';
+                    }
+                } else {
+                    showError('项目不存在或已停用');
+                }
+            } catch (error) {
+                console.error('加载offer信息失败:', error);
+                showError('加载项目信息失败，请刷新页面重试');
+            }
+        }
+
+        // 更新统计信息
+        function updateStats(remaining, total) {
+            document.getElementById('remainingCount').textContent = remaining;
+            document.getElementById('totalCount').textContent = total;
+
+            // 更新进度条
+            const percentage = total > 0 ? (remaining / total * 100) : 0;
+            document.getElementById('progressFill').style.width = percentage + '%';
+        }
+
+        // 申请邀请码
+        async function claimCode() {
+            const claimBtn = document.getElementById('claimBtn');
+            const loading = document.getElementById('loading');
+            const resultSection = document.getElementById('resultSection');
+
+            // 显示加载状态
+            claimBtn.disabled = true;
+            loading.style.display = 'block';
+            resultSection.style.display = 'none';
+
+            try {
+                const response = await fetch(`${API_BASE}/offers/${offerName}/claim`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_ip: null, // 让后端自动获取
+                        user_agent: navigator.userAgent
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentCode = data.data.code;
+                    showSuccess(data.data.message, currentCode);
+
+                    // 刷新统计信息
+                    setTimeout(loadOfferInfo, 1000);
+                } else {
+                    const errorInfo = await response.json();
+                    showError(errorInfo.error || '申请失败，请重试');
+                    claimBtn.disabled = false;
+                }
+            } catch (error) {
+                console.error('申请邀请码失败:', error);
+                showError('网络错误，请检查网络连接后重试');
+                claimBtn.disabled = false;
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        // 显示成功结果
+        function showSuccess(message, code) {
+            const resultSection = document.getElementById('resultSection');
+            const resultMessage = document.getElementById('resultMessage');
+            const codeDisplay = document.getElementById('codeDisplay');
+            const invitationCode = document.getElementById('invitationCode');
+
+            resultSection.className = 'result-section result-success';
+            resultSection.style.display = 'block';
+            resultMessage.textContent = message;
+
+            codeDisplay.style.display = 'block';
+            invitationCode.textContent = code;
+
+            // 禁用申请按钮
+            const claimBtn = document.getElementById('claimBtn');
+            claimBtn.disabled = true;
+            claimBtn.textContent = '已成功领取';
+        }
+
+        // 显示错误结果
+        function showError(message) {
+            const resultSection = document.getElementById('resultSection');
+            const resultMessage = document.getElementById('resultMessage');
+            const codeDisplay = document.getElementById('codeDisplay');
+
+            resultSection.className = 'result-section result-error';
+            resultSection.style.display = 'block';
+            resultMessage.textContent = message;
+            codeDisplay.style.display = 'none';
+        }
+
+        // 复制邀请码到剪贴板
+        async function copyCode() {
+            if (!currentCode) return;
+
+            const copyBtn = document.getElementById('copyBtn');
+
+            try {
+                await navigator.clipboard.writeText(currentCode);
+                copyBtn.textContent = '已复制!';
+                copyBtn.classList.add('copied');
+
+                setTimeout(() => {
+                    copyBtn.textContent = '复制到剪贴板';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+
+            } catch (error) {
+                // 降级处理：使用传统方法复制
+                const textArea = document.createElement('textarea');
+                textArea.value = currentCode;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    copyBtn.textContent = '已复制!';
+                    copyBtn.classList.add('copied');
+
+                    setTimeout(() => {
+                        copyBtn.textContent = '复制到剪贴板';
+                        copyBtn.classList.remove('copied');
+                    }, 2000);
+                } catch (err) {
+                    alert('复制失败，请手动选择复制');
+                }
+                document.body.removeChild(textArea);
+            }
+        }
+
+        // 处理页面标题
+        document.title = `${offerName} - 邀请码领取`;
+    </script>
+</body>
+</html>
